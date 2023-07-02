@@ -1,0 +1,38 @@
+# Пропишем версию
+version: '3.9'
+# Перечислим сервисы
+services:
+    nginx:
+# Пропишем какой образ мы хотим использовать
+        image: nginx:latest
+# Назовем свой контейнер по красивому
+        container_name: nginx
+# Проброс портов
+        ports:
+            - "80:80"
+            - "443:443"
+# Проброс папок
+        volumes:
+            - ./nginx:/etc/nginx/conf.d
+            - ./www:/var/www/
+        #    - ./Nginx/Logs:/var/log/nginx/
+        #    - ./Nginx/html:/usr/share/nginx/html/
+# Укажем зависимости
+        links:
+            - php
+
+
+    php:
+# Билдим с помощью dockerfile указав директорию где он лежит
+        build: .
+
+        container_name: php-fpm
+
+        volumes:
+            - ./www:/var/www
+
+        healthcheck:
+          test: ["CMD-SHELL", "curl http://127.0.0.1 | grep works"]
+          interval: 5s
+          timeout: 5s
+          retries: 5
